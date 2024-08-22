@@ -2,6 +2,7 @@ import base64
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
+from tkinter import scrolledtext
 import string
 import secrets
 from itertools import cycle
@@ -34,7 +35,7 @@ class Entry(tk.Entry):
             self.config(fg=self.defaultfg)
 
 
-class Text(tk.Text):
+class Text(scrolledtext.ScrolledText):
 
     def __init__(self,master = None ,defaulttext = '', defaultfg='#3e3e3e', *args, **kwargs):
         super().__init__(master,*args, **kwargs)
@@ -203,18 +204,12 @@ frm1.pack()
 frm3 = tk.Frame(bd=5)
 frm_text1 = tk.Frame(frm3)
 frm_text2 = tk.Frame(frm3)
-yscroll_text1 = tk.Scrollbar(frm_text1)
-yscroll_text2 = tk.Scrollbar(frm_text2)
-input_text = Text(frm_text1,yscrollcommand=yscroll_text1.set, width=35, height=10, defaulttext='Enter the text here', font = 'TkTextFont', defaultfg='#3a3a3a')
-output_text = Text(frm_text2,yscrollcommand=yscroll_text2.set, width=35, height=10, defaulttext='The output will be shown here', font = 'TkTextFont', defaultfg='#3a3a3a')
-yscroll_text1.config(command=input_text.yview)
-yscroll_text2.config(command=output_text.yview)
+input_text = Text(frm_text1, width=35, height=10, defaulttext='Enter the text here', font = 'TkTextFont', defaultfg='#3a3a3a')
+output_text = Text(frm_text2,width=35, height=10, defaulttext='The output will be shown here', font = 'TkTextFont', defaultfg='#3a3a3a')
 btn_convert = ttk.Button(frm3,text='Encrypt', command=check)
 
 input_text.pack(side='left', fill='both', expand=1)
-yscroll_text1.pack(side='left', fill='y')
 output_text.pack(side='left', fill='both', expand=1)
-yscroll_text2.pack(side='left', fill='y')
 
 frm2 = tk.Frame(bd = 5)
 key_entry = Entry(frm2, defaulttext='Enter the key here')
