@@ -18,3 +18,5 @@ To ensure the security of the OTP, follow these guidelines:
 6. **No Patterns**: Avoid any patterns in the plaintext that could be exploited. Since the OTP provides perfect secrecy, any patterns in the plaintext can lead to vulnerabilities if the key is not truly random.
 
 In this program, there is an option called use hex key.  If you enable this option, it will generate random passwords containing hexadecimal characters for you and convert it to bytes data before encrypting and decrypting.
+
+This tool has no protection against side-channel attacks
