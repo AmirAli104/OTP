@@ -20,3 +20,6 @@ To ensure the security of the OTP, follow these guidelines:
 In this program, there is an option called use hex key.  If you enable this option, it will generate random passwords containing hexadecimal characters for you and convert it to bytes data before encrypting and decrypting.
 
 This tool has no protection against side-channel attacks
+
+# OTP-Key-Generator
+This program can generate a number of keys and put them in a file to use them in OTP. Because the keys are disposable.
