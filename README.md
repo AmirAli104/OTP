@@ -17,3 +17,8 @@ This tool has no protection against side-channel attacks
 
 # OTP-Key-Generator
 This program can generate a number of keys and put them in a file to use them in OTP. Because the keys are disposable.
+
+This command creates a file named a.txt and puts 100 keys with length of 1000 in it:
+```
+otp-key-generator.py -n 100 -l 1000 -o a.txt
+```
