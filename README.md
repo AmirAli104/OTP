@@ -11,12 +11,6 @@ To ensure the security of the OTP, follow these guidelines:
 
 3. **Key Uniqueness**: Each key must be used only once. Reusing keys can lead to vulnerabilities and can allow attackers to derive information about the plaintext. 
 
-4. **Key Distribution**: The key must be securely shared between the sender and the receiver before communication. This can be done through secure channels, but it is crucial that the key remains confidential. 
-
-5. **Secure Storage**: Both the sender and receiver must securely store the key. If an attacker gains access to the key, they can decrypt any messages encrypted with it. 
-
-6. **No Patterns**: Avoid any patterns in the plaintext that could be exploited. Since the OTP provides perfect secrecy, any patterns in the plaintext can lead to vulnerabilities if the key is not truly random.
-
 In this program, there is an option called use hex key.  If you enable this option, it will generate random passwords containing hexadecimal characters for you and convert it to bytes data before encrypting and decrypting.
 
 This tool has no protection against side-channel attacks
