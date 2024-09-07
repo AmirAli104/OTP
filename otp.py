@@ -8,6 +8,17 @@ from itertools import cycle
 KEY_LETTERS = tuple(string.ascii_letters + string.punctuation + string.digits)
 APP_TITLE = 'OTP'
 
+input_empty = True
+key_empty = True
+
+def set_status(widget, value):
+    global input_empty,key_empty
+    if isinstance(widget, Text):
+        if widget == input_text:
+            input_empty = value
+    else:
+        key_empty = value
+
 class Entry(tk.Entry):
 
     def __init__(self,master = None ,defaulttext = '', defaultfg='#3e3e3e', *args, **kwargs):
@@ -24,14 +35,16 @@ class Entry(tk.Entry):
 
     def _focus_in_handler(self, event=None):
         if self.get() == self.defaulttext and self['fg'] == self.defaultfg:
-            self.delete(0, tk.END)
+            self.delete(0, 'end')
             self.config(fg=self.mainfg)
 
     def _focus_out_handler(self, event=None):
-        if not self.get() or (self.get() == self.defaulttext and self['fg'] == self.defaultfg):
+        if not self.get():
             self.insert(0, self.defaulttext)
             self.config(fg=self.defaultfg)
-
+            set_status(self, True)
+        else:
+            set_status(self, False)
 
 class Text(ScrolledText):
 
@@ -47,14 +60,17 @@ class Text(ScrolledText):
         self.bind('<FocusOut>', self._focus_out_handler)
 
     def _focus_in_handler(self, event=None):
-        if self.get('1.0', tk.END)[:-1] == self.defaulttext and self['fg'] == self.defaultfg:
-            self.delete('1.0', tk.END)
+        if self.get('0.0', 'end')[:-1] == self.defaulttext and self['fg'] == self.defaultfg:
+            self.delete('0.0', 'end')
             self.config(fg=self.mainfg)
 
     def _focus_out_handler(self, event=None):
-        if not self.get('1.0', tk.END)[:-1] or (self.get('1.0', tk.END)[:-1] == self.defaulttext and self['fg'] == self.defaultfg):
+        if not self.get('0.0', 'end')[:-1]:
             self.insert('1.0', self.defaulttext)
             self.config(fg=self.defaultfg)
+            set_status(self, True)
+        else:
+            set_status(self, False)
 
 def clear_widget(widget):
     if isinstance(widget, Entry):
@@ -64,6 +80,7 @@ def clear_widget(widget):
     if window.focus_get() != widget:
         widget.insert('end', widget.defaulttext)
         widget.config(fg = widget.defaultfg)
+        set_status(widget, True)
 
 def decode_text(encrypted_text):
     try:
@@ -114,27 +131,35 @@ def decrypt(encrypted_text,key):
     return decrypted_text
 
 def check():
-    try:
-        if var.get():
-            data = encrypt(input_text.get('1.0','end'), key_entry.get())
-        else:
-            data = decrypt(input_text.get('1.0','end'), key_entry.get())
-        if data:
-            output_text.delete('1.0','end')
-            output_text.insert('1.0', data)
-    except:
-        messagebox.showerror(title=APP_TITLE, message='An error occured while decrypting. Your key is probably wrong')
+    if not key_empty and not input_empty:
+        try:
+            if var.get():
+                data = encrypt(input_text.get('1.0','end'), key_entry.get())
+            else:
+                data = decrypt(input_text.get('1.0','end'), key_entry.get())
+            if data:
+                output_text.delete('1.0','end')
+                output_text.insert('1.0', data)
+        except:
+            messagebox.showerror(title=APP_TITLE, message='An error occured while decrypting. Your key is probably wrong')
+    else:
+        messagebox.showwarning(title=APP_TITLE, message='You should enter both key and input text to encrypt or decrypt it.')
 
 def create_random_key():
-    key_entry.delete(0, 'end')
-    key = ''
-    text_length = len(input_text.get('1.0', 'end'))
-    if not use_hex_var.get():
-        for i in range(text_length):
-            key += secrets.choice(KEY_LETTERS)
+    global key_empty
+    if not input_empty:
+        key_entry.delete(0, 'end')
+        key = ''
+        text_length = len(input_text.get('1.0', 'end'))
+        if not use_hex_var.get():
+            for i in range(text_length):
+                key += secrets.choice(KEY_LETTERS)
+        else:
+            key = secrets.token_hex(text_length)
+        key_entry.insert(0, key)
+        key_empty = False
     else:
-        key = secrets.token_hex(text_length)
-    key_entry.insert(0, key)
+        messagebox.showwarning(title=APP_TITLE, message='You should enter an input text to make a random key for it')
 
 def copy_entry():
     window.clipboard_clear()
