@@ -177,25 +177,22 @@ def create_context_menu(is_entry):
     context_menu.add_command(label='Cut', accelerator='Ctrl+X')
     context_menu.add_separator()
     if is_entry:
-        context_menu.add_command(label='Copy Key', command=lambda : copy_entry())
-        context_menu.add_command(label='Delete Key', command=lambda : clear_widget(key_entry))
+        context_menu.add_command(label='Copy Key', command=lambda : copy_entry(),accelerator='Ctrl+C')
+        context_menu.add_command(label='Delete Key', command=lambda : clear_widget(key_entry),accelerator='Ctrl+D')
     if not is_entry:
-        context_menu.add_command()
-        context_menu.add_command()
+        context_menu.add_command(accelerator='Ctrl+C')
+        context_menu.add_command(accelerator='Ctrl+D')
     return context_menu
 
 def configure_menu(event, context_menu):
     if isinstance(event.widget, Text):
         if event.widget == input_text:
-            context_menu.entryconfigure(5, label='Copy Input')
-            context_menu.entryconfigure(6, label='Clear Input')
-            context_menu.entryconfigure(5, command=lambda: copy_text(event.widget))
-            context_menu.entryconfigure(6, command=lambda: clear_widget(event.widget))
+            context_menu.entryconfigure(5, label='Copy Input',command=lambda: copy_text(event.widget))
+            context_menu.entryconfigure(6, label='Clear Input', command=lambda: clear_widget(event.widget))
+
         elif event.widget == output_text:
-            context_menu.entryconfigure(5, label='Copy Output')
-            context_menu.entryconfigure(6, label='Clear Output')
-            context_menu.entryconfigure(5, command=lambda: copy_text(event.widget))
-            context_menu.entryconfigure(6, command=lambda: clear_widget(event.widget))
+            context_menu.entryconfigure(5, label='Copy Output', command=lambda: copy_text(event.widget))
+            context_menu.entryconfigure(6, label='Clear Output', command=lambda: clear_widget(event.widget))
 
     if window.focus_get() == event.widget:
         for i in range(4):
@@ -225,37 +222,50 @@ key_entry_menu = create_context_menu(True)
 
 window.title(APP_TITLE)
 
+rb_frm = tk.Frame(bd=5)
+text_frm = tk.Frame(bd=5)
+key_frm = tk.Frame(bd = 5)
+
 var = tk.IntVar(value=1)
-frm1 = tk.Frame(bd=5)
-encrypt_rb = ttk.Radiobutton(frm1,text='Encrypt', variable=var, value=1, command = lambda : btn_convert.config(text='Encrypt'))
-decrypt_rb = ttk.Radiobutton(frm1,text='Decrypt', variable=var, value=0, command = lambda : btn_convert.config(text='Decrypt'))
+encrypt_rb = ttk.Radiobutton(rb_frm,text='Encrypt', variable=var, value=1, command = lambda : btn_convert.config(text='Encrypt'))
+decrypt_rb = ttk.Radiobutton(rb_frm,text='Decrypt', variable=var, value=0, command = lambda : btn_convert.config(text='Decrypt'))
+
+input_text = Text(text_frm,width=45, height=13, defaulttext='Enter the text here', font = 'TkTextFont', 
+                  defaultfg='#3a3a3a', wrap = 'word',insertwidth=1)
+output_text = Text(text_frm,width=45, height=13, defaulttext='The output will be shown here', font = 'TkTextFont', 
+                   defaultfg='#3a3a3a', wrap = 'word',insertwidth=1)
+btn_convert = ttk.Button(text_frm,text='Encrypt', command=check)
+
+use_hex_var = tk.IntVar()
+key_entry = Entry(key_frm, defaulttext='Enter the key here',insertwidth=1)
+random_btn = ttk.Button(key_frm,text='random', command=create_random_key)
+use_hex_cb = ttk.Checkbutton(key_frm,text='Use hex key', variable=use_hex_var)
+
+window.bind_class('Text','<Button-3>', lambda event : show_menu(event, text_menu))
+key_entry.bind('<Button-3>', lambda event : show_menu(event, key_entry_menu))
+
+output_text.bind('<Control-c>',lambda event : copy_text(output_text))
+output_text.bind('<Control-d>',lambda event : clear_widget(output_text))
+
+input_text.bind('<Control-c>',lambda event : copy_text(input_text))
+input_text.bind('<Control-d>',lambda event : clear_widget(input_text))
+
+key_entry.bind('<Control-c>',lambda event : copy_entry())
+key_entry.bind('<Control-d>',lambda event : clear_widget(key_entry))
+
+rb_frm.pack()
+key_frm.pack(anchor='w')
+text_frm.pack(fill='both', expand=1)
+
 encrypt_rb.pack(side='left',padx=(0,10))
 decrypt_rb.pack(side='left',padx=(10,0))
-frm1.pack()
-
-frm3 = tk.Frame(bd=5)
-input_text = Text(frm3,width=45, height=13, defaulttext='Enter the text here', font = 'TkTextFont', defaultfg='#3a3a3a', wrap = 'word')
-output_text = Text(frm3,width=45, height=13, defaulttext='The output will be shown here', font = 'TkTextFont', defaultfg='#3a3a3a', wrap = 'word')
-btn_convert = ttk.Button(frm3,text='Encrypt', command=check)
-
-frm2 = tk.Frame(bd = 5)
-key_entry = Entry(frm2, defaulttext='Enter the key here')
-random_btn = ttk.Button(frm2,text='random', command=create_random_key)
-use_hex_var = tk.IntVar()
-use_hex_cb = ttk.Checkbutton(frm2,text='Use hex key', variable=use_hex_var)
 
 use_hex_cb.grid(row = 0,column = 0)
-key_entry.grid(row=1, column=0, sticky='w', pady=5)
+key_entry.grid(row=1, column=0, sticky='w', pady=5,ipady=1)
 random_btn.grid(row=1,column=1, padx=5)
 
 input_text.pack(side='left', fill='both', expand=1)
 btn_convert.pack(side='left', padx=10)
 output_text.pack(side='left',fill='both', expand=1)
-
-window.bind_class('Text','<Button-3>', lambda event : show_menu(event, text_menu))
-key_entry.bind('<Button-3>', lambda event : show_menu(event, key_entry_menu))
-
-frm2.pack(anchor='w')
-frm3.pack(fill='both', expand=1)
 
 window.mainloop()
