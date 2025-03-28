@@ -1,5 +1,6 @@
 import base64, string, secrets
 import tkinter as tk
+from ttkthemes import ThemedTk
 from tkinter.scrolledtext import ScrolledText
 from tkinter import ttk
 from tkinter import messagebox
@@ -215,16 +216,17 @@ def show_menu(event, context_menu):
     context_menu = configure_menu(event, context_menu)
     context_menu.tk_popup(event.x_root, event.y_root)
 
-window = tk.Tk()
+window = ThemedTk(theme='yaru')
 
 text_menu = create_context_menu(False)
 key_entry_menu = create_context_menu(True)
 
 window.title(APP_TITLE)
 
-rb_frm = tk.Frame(bd=5)
-text_frm = tk.Frame(bd=5)
-key_frm = tk.Frame(bd = 5)
+root_frm = ttk.Frame()
+rb_frm = ttk.Frame(root_frm,padding = 5)
+text_frm = ttk.Frame(root_frm,padding = 5)
+key_frm = ttk.Frame(root_frm,padding = 5)
 
 var = tk.IntVar(value=1)
 encrypt_rb = ttk.Radiobutton(rb_frm,text='Encrypt', variable=var, value=1, command = lambda : btn_convert.config(text='Encrypt'))
@@ -253,6 +255,7 @@ input_text.bind('<Control-d>',lambda event : clear_widget(input_text))
 key_entry.bind('<Control-c>',lambda event : copy_entry())
 key_entry.bind('<Control-d>',lambda event : clear_widget(key_entry))
 
+root_frm.pack(fill='both',expand=1)
 rb_frm.pack()
 key_frm.pack(anchor='w')
 text_frm.pack(fill='both', expand=1)
