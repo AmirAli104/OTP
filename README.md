@@ -15,6 +15,10 @@ In this program, there is an option called use hex key.  If you enable this opti
 
 This tool has no protection against side-channel attacks
 
+---
+To use it first install ttkthemes:
+`$ pip install ttkthemes`
+
 # OTP-Key-Generator
 This program can generate a number of keys and put them in a file to use them in OTP. Because the keys are disposable.
 
