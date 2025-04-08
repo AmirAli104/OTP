@@ -2,8 +2,7 @@ import base64, string, secrets
 import tkinter as tk
 from ttkthemes import ThemedTk
 from tkinter.scrolledtext import ScrolledText
-from tkinter import ttk
-from tkinter import messagebox
+from tkinter import ttk, messagebox, filedialog
 from itertools import cycle
 
 KEY_LETTERS = tuple(string.ascii_letters + string.punctuation + string.digits)
@@ -73,6 +72,28 @@ class Text(ScrolledText):
         else:
             set_status(self, False)
 
+def show_error(message):
+    messagebox.showerror(title=APP_TITLE,message=message)
+
+def save_encrypted_output(binary):
+    if binary:
+        file_mode = 'wb'
+    else:
+        file_mode = 'w'
+
+    try:
+        file_obj = filedialog.asksaveasfile(mode=file_mode)
+
+        if file_obj:
+            if binary:
+                data = base64.b64decode(output_text.get('1.0','end'))
+            else:
+                data = output_text.get('1.0','end')
+
+            file_obj.write(data)
+    except PermissionError as err:
+        show_error(err)
+    
 def clear_widget(widget):
     if isinstance(widget, Entry):
         widget.delete(0,'end')
@@ -87,14 +108,14 @@ def decode_text(encrypted_text):
     try:
         return base64.b64decode(encrypted_text).decode()
     except:
-        messagebox.showerror(title = APP_TITLE, message = 'You should enter a base64 text to decrypt it')
+        show_error('You should enter a base64 text to decrypt it')
         return
 
 def convert_hex(key):
     try:
         return bytes.fromhex(key)
     except:
-        messagebox.showerror(title = APP_TITLE, message = 'Your key is not hexadecimal')
+        show_error('Your key is not hexadecimal')
         return
 
 def encrypt(text,key):
@@ -142,7 +163,7 @@ def check():
                 output_text.delete('1.0','end')
                 output_text.insert('1.0', data)
         except:
-            messagebox.showerror(title=APP_TITLE, message='An error occured while decrypting. Your key is probably wrong')
+            show_error('An error occured while decrypting. Your key is probably wrong')
     else:
         messagebox.showwarning(title=APP_TITLE, message='You should enter both key and input text to encrypt or decrypt it.')
 
@@ -170,7 +191,7 @@ def copy_text(widget):
     window.clipboard_clear()
     window.clipboard_append(widget.get('1.0', 'end'))
 
-def create_context_menu(is_entry):
+def create_context_menu(is_entry,output_text=False):
     context_menu = tk.Menu(tearoff=0)
     context_menu.add_command(label='Select All', accelerator='Ctrl+A')
     context_menu.add_command(label='Copy', accelerator='Ctrl+C')
@@ -183,6 +204,11 @@ def create_context_menu(is_entry):
     if not is_entry:
         context_menu.add_command(accelerator='Ctrl+C')
         context_menu.add_command(accelerator='Ctrl+D')
+
+        if output_text:
+            context_menu.add_separator()
+            context_menu.add_command(label='Save as binary',command=lambda : save_encrypted_output(True),accelerator='Ctrl+S')
+            context_menu.add_command(label='Save as base64',command=lambda : save_encrypted_output(False),accelerator='Ctrl+Shift+S')
     return context_menu
 
 def configure_menu(event, context_menu):
@@ -218,7 +244,8 @@ def show_menu(event, context_menu):
 
 window = ThemedTk(theme='yaru')
 
-text_menu = create_context_menu(False)
+input_text_menu = create_context_menu(False)
+output_text_menu = create_context_menu(False,True)
 key_entry_menu = create_context_menu(True)
 
 window.title(APP_TITLE)
@@ -243,11 +270,14 @@ key_entry = Entry(key_frm, defaulttext='Enter the key here',insertwidth=1)
 random_btn = ttk.Button(key_frm,text='random', command=create_random_key)
 use_hex_cb = ttk.Checkbutton(key_frm,text='Use hex key', variable=use_hex_var)
 
-window.bind_class('Text','<Button-3>', lambda event : show_menu(event, text_menu))
+input_text.bind('<Button-3>', lambda event : show_menu(event,input_text_menu))
+output_text.bind('<Button-3>', lambda event : show_menu(event,output_text_menu))
 key_entry.bind('<Button-3>', lambda event : show_menu(event, key_entry_menu))
 
 output_text.bind('<Control-c>',lambda event : copy_text(output_text))
 output_text.bind('<Control-d>',lambda event : clear_widget(output_text))
+output_text.bind('<Control-s>',lambda event : save_encrypted_output(True))
+output_text.bind('<Control-S>',lambda event : save_encrypted_output(False))
 
 input_text.bind('<Control-c>',lambda event : copy_text(input_text))
 input_text.bind('<Control-d>',lambda event : clear_widget(input_text))
@@ -257,14 +287,14 @@ key_entry.bind('<Control-d>',lambda event : clear_widget(key_entry))
 
 root_frm.pack(fill='both',expand=1)
 rb_frm.pack()
-key_frm.pack(anchor='w')
+key_frm.pack(anchor='w',fill='x')
 text_frm.pack(fill='both', expand=1)
 
 encrypt_rb.pack(side='left',padx=(0,10))
 decrypt_rb.pack(side='left',padx=(10,0))
 
 use_hex_cb.grid(row = 0,column = 0)
-key_entry.grid(row=1, column=0, sticky='w', pady=5,ipady=1)
+key_entry.grid(row=1, column=0, sticky='e', pady=5,ipady=1)
 random_btn.grid(row=1,column=1, padx=5)
 
 input_text.pack(side='left', fill='both', expand=1)
