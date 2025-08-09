@@ -75,7 +75,7 @@ class Text(ScrolledText):
 def show_error(message):
     messagebox.showerror(title=APP_TITLE,message=message)
 
-def save_encrypted_output(binary):
+def save_output(binary):
     if binary:
         file_mode = 'wb'
     else:
@@ -85,10 +85,17 @@ def save_encrypted_output(binary):
         file_obj = filedialog.asksaveasfile(mode=file_mode)
 
         if file_obj:
-            if binary:
-                data = base64.b64decode(output_text.get('1.0','end'))
+            if var.get():
+                if binary:
+                    data = base64.b64decode(output_text.get('1.0','end'))
+                else:
+                    data = output_text.get('1.0','end')
+
             else:
-                data = output_text.get('1.0','end')
+                if binary:
+                    data = output_text.get('1.0','end').encode()
+                else:
+                    data = base64.b64encode(output_text.get('1.0','end').encode()).decode()
 
             file_obj.write(data)
     except PermissionError as err:
@@ -207,8 +214,8 @@ def create_context_menu(is_entry,output_text=False):
 
         if output_text:
             context_menu.add_separator()
-            context_menu.add_command(label='Save as binary',command=lambda : save_encrypted_output(True),accelerator='Ctrl+S')
-            context_menu.add_command(label='Save as base64',command=lambda : save_encrypted_output(False),accelerator='Ctrl+Shift+S')
+            context_menu.add_command(label='Save as binary',command=lambda : save_output(True),accelerator='Ctrl+S')
+            context_menu.add_command(label='Save as base64',command=lambda : save_output(False),accelerator='Ctrl+Shift+S')
     return context_menu
 
 def configure_menu(event, context_menu):
@@ -276,8 +283,8 @@ key_entry.bind('<Button-3>', lambda event : show_menu(event, key_entry_menu))
 
 output_text.bind('<Control-c>',lambda event : copy_text(output_text))
 output_text.bind('<Control-d>',lambda event : clear_widget(output_text))
-output_text.bind('<Control-s>',lambda event : save_encrypted_output(True))
-output_text.bind('<Control-S>',lambda event : save_encrypted_output(False))
+output_text.bind('<Control-s>',lambda event : save_output(True))
+output_text.bind('<Control-S>',lambda event : save_output(False))
 
 input_text.bind('<Control-c>',lambda event : copy_text(input_text))
 input_text.bind('<Control-d>',lambda event : clear_widget(input_text))
