@@ -22,8 +22,7 @@ def create_random_key():
 if __name__ == '__main__':
     print('Generating Keys ...')
     with open(args.output, 'w') as f:
-        for i in range(args.number):
-            print(f'{i+1}/{args.number}', end='\r')
+        for i in range(1, args.number+1):
+            print(f'{i}/{args.number}', end='\r')
             f.write(create_random_key() + '\n\n')
-            f.flush()
     print('Done.' + ' ' * (len(f'{args.number}/{args.number}') - 5))
