@@ -28,3 +28,12 @@ This command creates a file named a.txt and puts 100 keys with length of 1000 in
 ```
 otp-key-generator.py -n 100 -l 1000 -o a.txt
 ```
+
+## Options
+
+|option|description|
+|------|-----------|
+|`-n, --number`|The number of keys|
+|`-x, --hex`|Create hexadecimal keys|
+|`-o, --output`|The name of output file|
+|`-l, --length`|The length of generated keys|
