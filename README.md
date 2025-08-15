@@ -37,3 +37,4 @@ otp-key-generator.py -n 100 -l 1000 -o a.txt
 |`-x, --hex`|Create hexadecimal keys|
 |`-o, --output`|The name of output file|
 |`-l, --length`|The length of generated keys|
+|`-h,--help`|Show help message and exit|
